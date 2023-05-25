@@ -19,6 +19,9 @@ set(PROJECT_SOURCES
         qtodo.cpp
         qtodo.h
         qtodo.ui
+        dialog.cpp
+        dialog.h
+        dialog.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
