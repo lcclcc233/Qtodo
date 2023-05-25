@@ -9,6 +9,7 @@ Dialog::Dialog(CItem &_i, QWidget *parent) :
 {
     setWindowModality(Qt::WindowModal);
     ui->setupUi(this);
+    ui->dateTimeEdit->setCalendarPopup(true);
     ui->dateTimeEdit->setDateTime(QDateTime::currentDateTime());
 }
 Dialog::~Dialog()
@@ -21,6 +22,6 @@ void Dialog::on_buttonBox_accepted()
     input.name = ui->textEdit->toPlainText();
     input.ddl = ui->dateTimeEdit->dateTime();
     input.is_finish = false;
-    qDebug()<<tr("input finished");
+    //qDebug()<<tr("input finished");
 }
 
