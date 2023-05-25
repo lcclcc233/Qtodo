@@ -16,10 +16,10 @@ public:
     ~Qtodo();
 
 private slots:
-    void on_pushButton_clicked();
 
-    void on_pushButton_2_clicked();
+    void on_additemButton_clicked();
 
+    void anyStateChanged();
 private:
     Ui::Qtodo *ui;
 };

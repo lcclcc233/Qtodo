@@ -4,6 +4,7 @@
 #include "dialog.h"
 #include <QMessageBox>
 #include <QCheckBox>
+#include <qfont.h>
 Qtodo::Qtodo(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::Qtodo)
@@ -16,16 +17,12 @@ Qtodo::~Qtodo()
     delete ui;
 }
 
-void Qtodo::on_pushButton_clicked()
-{
-    int ret=QMessageBox::information(this,tr("你好"),tr("Hello world!"));
-    if(ret==QMessageBox::Ok) qDebug()<<tr("你好！");
-}
-
-void Qtodo::on_pushButton_2_clicked()
+CItem items[100];
+int itemcnt = 0;
+void Qtodo::on_additemButton_clicked()
 {
     //CItem input("程设实习大作业",QDateTime::fromString("2023-06-04 00:00:00","yyyy-MM-dd hh:mm:ss"),false);
-    CItem input;
+    CItem &input = items[itemcnt++];
     Dialog* pDialog = new Dialog(input, this);
     int ret = pDialog->exec();
     pDialog->close();
@@ -38,5 +35,23 @@ void Qtodo::on_pushButton_2_clicked()
     pcheckbox->setChecked(input.is_finish);//好像没必要？毕竟不会有true
     ui->listWidget->addItem(pitem);
     ui->listWidget->setItemWidget(pitem,pcheckbox);
+    connect(pcheckbox, SIGNAL(stateChanged(int)), this, SLOT(anyStateChanged()));
 }
 
+void Qtodo::anyStateChanged(){
+    for(int i = 0; i < ui->listWidget->count(); i++){
+        QListWidgetItem *pitem =ui->listWidget->item(i);
+        QCheckBox *pcheckbox =static_cast<QCheckBox *>(ui->listWidget->itemWidget(pitem));
+        items[i].is_finish=pcheckbox->isChecked();
+        if(items[i].is_finish){
+            QFont font;
+            font.setStrikeOut(true);
+            pitem->setFont(font);
+        }
+        else{
+            QFont font;
+            font.setStrikeOut(false);
+            pitem->setFont(font);
+        }
+    }
+}
