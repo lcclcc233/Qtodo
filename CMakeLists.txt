@@ -22,6 +22,7 @@ set(PROJECT_SOURCES
         dialog.cpp
         dialog.h
         dialog.ui
+        tmp.png
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
