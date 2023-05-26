@@ -34,12 +34,13 @@ int itemcnt = 0;
 void Qtodo::on_additemButton_clicked()
 {
     //CItem input("程设实习大作业",QDateTime::fromString("2023-06-04 00:00:00","yyyy-MM-dd hh:mm:ss"),false);
-    CItem &input = items[itemcnt++];
+    CItem &input = items[itemcnt];
     Dialog* pDialog = new Dialog(input, this);
     int ret = pDialog->exec();
     pDialog->close();
     if(ret == QDialog::Rejected)
         return;
+    itemcnt++;
     QListWidgetItem *pitem = new QListWidgetItem;
     QString out=QString("   %1").arg(input.name, -70+input.name.length(), QLatin1Char(' '))+input.ddl.toString();
     pitem->setText(out);
@@ -71,7 +72,7 @@ void Qtodo::anyStateChanged(){
 void Qtodo::on_checkitem(){
     QDateTime now=QDateTime::currentDateTime();
     for(int i=0; i < itemcnt; i++){
-        //qDebug()<<now.secsTo(items[i].ddl);
+        //qDebug()<<now.msecsTo(items[i].ddl);
         if(!items[i].is_finish &&  abs(now.msecsTo(items[i].ddl)) <= 5000){
             QMessageBox *box = new QMessageBox(this);
             box->setText(QString("the deadline of ") + items[i].name + QString(" is comming !"));

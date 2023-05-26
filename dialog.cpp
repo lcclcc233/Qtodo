@@ -10,6 +10,7 @@ Dialog::Dialog(CItem &_i, QWidget *parent) :
     ui->setupUi(this);
     ui->dateTimeEdit->setCalendarPopup(true);
     ui->dateTimeEdit->setDateTime(QDateTime::currentDateTime());
+    ui->dateTimeEdit->setDisplayFormat("yyyy-MM-dd hh:mm");
 }
 Dialog::~Dialog()
 {
