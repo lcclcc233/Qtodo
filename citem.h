@@ -9,9 +9,11 @@ private:
 public:
     QString name;//成员变量应该放private更好，暂时放外面方便写
     QDateTime ddl;
+    QDateTime reminder_time;
     bool is_finish;
+    bool is_whole_day;
     CItem();
-    CItem(QString _s, QDateTime _d, bool _i=false);
+    CItem(QString _s, QDateTime _d, QDateTime _r, bool _iw=false, bool _if=false);
 };
 
 #endif // CITEM_H
