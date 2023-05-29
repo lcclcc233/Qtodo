@@ -23,6 +23,9 @@ set(PROJECT_SOURCES
         dialog.h
         dialog.ui
         tmp.png
+        reminder.cpp
+        reminder.h
+        reminder.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
