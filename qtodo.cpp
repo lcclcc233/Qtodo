@@ -8,6 +8,8 @@
 #include <QCheckBox>
 #include <qfont.h>
 #include <QTimer>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
 Qtodo::Qtodo(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::Qtodo)
@@ -23,6 +25,10 @@ Qtodo::Qtodo(QWidget *parent)
     pTrayIcon->setIcon(icon);
     pTrayIcon->setToolTip("Qtodo");
     connect(pTrayIcon,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this,SLOT(on_activatedSysTrayIcon(QSystemTrayIcon::ActivationReason)));
+    ui->treeWidget->setColumnCount(2);
+    QStringList head;
+    head<<"事项名称"<<"截止时间";
+    ui->treeWidget->setHeaderLabels(head);
 }
 Qtodo::~Qtodo()
 {
@@ -31,53 +37,84 @@ Qtodo::~Qtodo()
     delete pTrayIcon;
 }
 
-CItem items[100];
-int itemcnt = 0;
+
+void Qtodo::additem(QTreeWidgetItem* pitem, QTreeWidgetItem* fa, const CItem& input){
+    if(pitem==NULL)
+        pitem = new QTreeWidgetItem;
+    pitem->setText(0,"   "+input.name);
+    pitem->setText(1,input.ddl.toString("yyyy-MM-dd hh:mm"));
+    QCheckBox *pcheckbox = new QCheckBox;
+    pcheckbox->setChecked(input.is_finish);
+    if(fa==NULL)
+        ui->treeWidget->addTopLevelItem(pitem);
+    else
+        fa->addChild(pitem);
+    ui->treeWidget->setItemWidget(pitem, 0, pcheckbox);
+    connect(pcheckbox, SIGNAL(stateChanged(int)), this, SLOT(anyStateChanged()));
+}
 void Qtodo::on_additemButton_clicked()//增加事项
 {
-    CItem &input = items[itemcnt];
+    CItem &input = items[itemcnt + 1];
     Dialog* pDialog = new Dialog(input, this);
     int ret = pDialog->exec();
     pDialog->close();
     if(ret == QDialog::Rejected)
         return;
     itemcnt++;
-    QListWidgetItem *pitem = new QListWidgetItem;
-    QString out;
-    if(!input.is_whole_day)
-        out=QString("   %1").arg(input.name, -70+input.name.length(), QLatin1Char(' '))+input.ddl.toString("yyyy-MM-dd hh:mm:ss");
-    else
-        out=QString("   %1").arg(input.name, -70+input.name.length(), QLatin1Char(' '))+input.ddl.toString("yyyy-MM-dd");
-    pitem->setText(out);
-    QCheckBox *pcheckbox = new QCheckBox;
-    pcheckbox->setChecked(input.is_finish);
-    ui->listWidget->addItem(pitem);
-    ui->listWidget->setItemWidget(pitem,pcheckbox);
-    connect(pcheckbox, SIGNAL(stateChanged(int)), this, SLOT(anyStateChanged()));
+    additem(NULL, NULL, input);
+    childid[0][ui->treeWidget->topLevelItemCount() - 1] = itemcnt;
 }
-
-void Qtodo::anyStateChanged(){//事项被勾选
-    for(int i = 0; i < ui->listWidget->count(); i++){
-        QListWidgetItem *pitem =ui->listWidget->item(i);
-        QCheckBox *pcheckbox =static_cast<QCheckBox *>(ui->listWidget->itemWidget(pitem));
-        items[i].is_finish=pcheckbox->isChecked();
-        if(items[i].is_finish){
+void Qtodo::handlecheck(QTreeWidgetItem* fa, int fid, bool paint){
+    for(int i = 0; i< fa->childCount(); i++){
+        QTreeWidgetItem *pitem = fa->child(i);
+        int idx = childid[fid][i];
+        QCheckBox *pcheckbox =static_cast<QCheckBox *>(ui->treeWidget->itemWidget(pitem,0));
+        if(paint)
+            pcheckbox->setCheckState(Qt::Checked);
+        items[idx].is_finish=pcheckbox->isChecked();
+        if(items[idx].is_finish){
             QFont font;
             font.setStrikeOut(true);
-            pitem->setFont(font);
+            pitem->setFont(0, font);
+            pitem->setFont(1, font);
+            handlecheck(pitem, idx, true);
         }
         else{
             QFont font;
             font.setStrikeOut(false);
-            pitem->setFont(font);
+            pitem->setFont(0, font);
+            pitem->setFont(1, font);
+            handlecheck(pitem, idx, false);
+        }
+    }
+}
+void Qtodo::anyStateChanged(){//事项被勾选
+    for(int i = 0; i < ui->treeWidget->topLevelItemCount(); i++){
+        QTreeWidgetItem *pitem = ui->treeWidget->topLevelItem(i);
+        int idx = childid[0][i];
+        QCheckBox *pcheckbox =static_cast<QCheckBox *>(ui->treeWidget->itemWidget(pitem,0));
+        items[idx].is_finish=pcheckbox->isChecked();
+        if(items[idx].is_finish){
+            QFont font;
+            font.setStrikeOut(true);
+            pitem->setFont(0, font);
+            pitem->setFont(1, font);
+            handlecheck(pitem, idx, true);
+        }
+        else{
+            QFont font;
+            font.setStrikeOut(false);
+            pitem->setFont(0, font);
+            pitem->setFont(1, font);
+            handlecheck(pitem, idx, false);
         }
     }
 }
 
 void Qtodo::on_checkitem(){//检测提醒
     QDateTime now=QDateTime::currentDateTime();
-    for(int i=0; i < itemcnt; i++){
-        qDebug()<<now.msecsTo(items[i].reminder_time);
+    for(int i=1; i <= itemcnt; i++){
+        //qDebug()<<now.msecsTo(items[i].reminder_time);
         if(!items[i].is_finish &&  abs(now.msecsTo(items[i].reminder_time)) <= 5000){
             reminder *prm = new reminder(this, items[i]);
             prm->work();
@@ -101,25 +138,34 @@ void Qtodo::on_activatedSysTrayIcon(QSystemTrayIcon::ActivationReason reason){//
     }
 }
 
-void Qtodo::on_listWidget_itemClicked(QListWidgetItem *pitem)
+int Qtodo::find_id(QTreeWidgetItem *pitem){
+    QTreeWidgetItem *fa = pitem->parent();
+    if(fa == NULL){
+        for(int i = 0; i < ui->treeWidget->topLevelItemCount(); i++){
+            QTreeWidgetItem *tmp = ui->treeWidget->topLevelItem(i);
+            if(tmp == pitem)
+                return childid[0][i];
+        }
+    }
+    int fid=find_id(fa);
+    for(int i = 0; i< fa->childCount(); i++){
+        QTreeWidgetItem *tmp = fa->child(i);
+        if(tmp == pitem)
+            return childid[fid][i];
+    }
+    qDebug()<<"find_id error";
+    return 0;
+}
+void Qtodo::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *pitem, int)
 {
-    int row=ui->listWidget->row(pitem);
-    CItem tmp(items[row]);
-    item_display display(this, tmp);
+    int idx=find_id(pitem);
+    CItem input(items[idx]);
+    item_display display(this, input, pitem);
     int ret=display.exec();
     display.close();
     if(ret==Dialog::Rejected)
         return ;
-    items[row]=tmp;
-    QString out;
-    if(!tmp.is_whole_day)
-        out=QString("   %1").arg(tmp.name, -70+tmp.name.length(), QLatin1Char(' '))+tmp.ddl.toString("yyyy-MM-dd hh:mm:ss");
-    else
-        out=QString("   %1").arg(tmp.name, -70+tmp.name.length(), QLatin1Char(' '))+tmp.ddl.toString("yyyy-MM-dd");
-    pitem->setText(out);
-    QCheckBox *pcheckbox = new QCheckBox;
-    pcheckbox->setChecked(tmp.is_finish);
-    ui->listWidget->setItemWidget(pitem,pcheckbox);
-    connect(pcheckbox, SIGNAL(stateChanged(int)), this, SLOT(anyStateChanged()));
+    items[idx]=input;
+    additem(pitem, pitem->parent(), input);
 }
 
