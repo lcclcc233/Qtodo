@@ -11,6 +11,7 @@ CONFIG += c++17
 SOURCES += \
     citem.cpp \
     dialog.cpp \
+    item_display.cpp \
     main.cpp \
     qtodo.cpp \
     reminder.cpp
@@ -19,12 +20,14 @@ SOURCES += \
 HEADERS += \
     citem.h \
     dialog.h \
+    item_display.h \
     qtodo.h \
     reminder.h
 
 
 FORMS += \
     dialog.ui \
+    item_display.ui \
     qtodo.ui \
     reminder.ui
 
@@ -36,3 +39,4 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     Images.qrc
+    
