@@ -18,6 +18,10 @@ public:
 private slots:
     void on_buttonBox_accepted();
 
+    void on_wholeday_checkBox_stateChanged(int arg1);
+
+    void on_dateTimeEdit_dateTimeChanged(const QDateTime &dateTime);
+
 private:
     Ui::Dialog *ui;
 };
