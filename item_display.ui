@@ -111,6 +111,19 @@
     <string>全天</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="addsubButton">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>250</y>
+     <width>80</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>增加子任务</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections>

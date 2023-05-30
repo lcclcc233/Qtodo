@@ -14,7 +14,7 @@ class Dialog : public QDialog
 public:
     ~Dialog();
     CItem &input;
-    explicit Dialog(CItem &_i, QWidget *parent = nullptr);
+    explicit Dialog(CItem &_i, QWidget *parent = nullptr,const CItem* fa=NULL);
 private slots:
     void on_buttonBox_accepted();
 

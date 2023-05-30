@@ -27,16 +27,6 @@
      <string>增加待办事项</string>
     </property>
    </widget>
-   <widget class="QListWidget" name="listWidget">
-    <property name="geometry">
-     <rect>
-      <x>275</x>
-      <y>21</y>
-      <width>431</width>
-      <height>531</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QPushButton" name="hideButton">
     <property name="geometry">
      <rect>
@@ -118,6 +108,21 @@
      </widget>
     </widget>
    </widget>
+   <widget class="QTreeWidget" name="treeWidget">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>30</y>
+      <width>431</width>
+      <height>451</height>
+     </rect>
+    </property>
+    <column>
+     <property name="text">
+      <string notr="true">1</string>
+     </property>
+    </column>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -125,7 +130,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>25</height>
+     <height>17</height>
     </rect>
    </property>
   </widget>

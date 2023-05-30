@@ -1,7 +1,7 @@
 #include "dialog.h"
 #include "ui_dialog.h"
 
-Dialog::Dialog(CItem &_i, QWidget *parent) :
+Dialog::Dialog(CItem &_i, QWidget *parent, const CItem* fa) :
     QDialog(parent),
     ui(new Ui::Dialog),
     input(_i)
@@ -9,10 +9,16 @@ Dialog::Dialog(CItem &_i, QWidget *parent) :
     setWindowModality(Qt::WindowModal);
     ui->setupUi(this);
     ui->dateTimeEdit->setCalendarPopup(true);
-    ui->dateTimeEdit->setDateTime(QDateTime::currentDateTime());
+    if(fa==NULL)
+        ui->dateTimeEdit->setDateTime(QDateTime::currentDateTime());
+    else
+        ui->dateTimeEdit->setDateTime(fa->ddl);
     ui->dateTimeEdit->setDisplayFormat("yyyy-MM-dd hh:mm");
     ui->dateTimeEdit_2->setCalendarPopup(true);
-    ui->dateTimeEdit_2->setDateTime(QDateTime::currentDateTime());
+    if(fa==NULL)
+        ui->dateTimeEdit_2->setDateTime(QDateTime::currentDateTime());
+    else
+        ui->dateTimeEdit_2->setDateTime(fa->reminder_time);
     ui->dateTimeEdit_2->setDisplayFormat("yyyy-MM-dd hh:mm");
 }
 Dialog::~Dialog()

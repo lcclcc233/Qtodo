@@ -1,10 +1,14 @@
 #include "item_display.h"
 #include "ui_item_display.h"
-
-item_display::item_display(QWidget *parent, CItem& i) :
+#include "qtodo.h"
+#include "dialog.h"
+#include "citem.h"
+item_display::item_display(QWidget *parent, CItem& i, QTreeWidgetItem* p) :
     QDialog(parent),
     ui(new Ui::item_display),
-    item(i)
+    qtodo((Qtodo*)parent),
+    item(i),
+    pitem(p)
 {
     setWindowModality(Qt::WindowModal);
     ui->setupUi(this);
@@ -53,5 +57,20 @@ void item_display::on_checkBox_stateChanged(int state)
 void item_display::on_dateTimeEdit_dateTimeChanged(const QDateTime &dateTime)
 {
     ui->dateTimeEdit_2->setDateTime(dateTime);
+}
+
+
+void item_display::on_addsubButton_clicked()
+{
+    CItem &input = qtodo->items[qtodo->itemcnt + 1];
+    Dialog* pDialog = new Dialog(input, this, &item);
+    int ret = pDialog->exec();
+    pDialog->close();
+    if(ret == QDialog::Rejected)
+      return;
+    qtodo->itemcnt++;
+    qtodo->additem(NULL, pitem, input);
+    int idx=qtodo->find_id(pitem);
+    qtodo->childid[idx][pitem->childCount() - 1] = qtodo->itemcnt;
 }
 
