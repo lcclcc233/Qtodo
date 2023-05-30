@@ -16,8 +16,8 @@ Qtodo::Qtodo(QWidget *parent)
     connect(timer, SIGNAL(timeout()), this, SLOT(on_checkitem()));
     timer->start(10000);
     pTrayIcon = new QSystemTrayIcon(this);
-    //QIcon icon = QIcon(":/tmp.png");//相对路径总是搞不定，暂且搁置
-    QIcon icon = QIcon("C:/Users/28104/Documents/Qtodo/tmp.png");//暂时用着这个图标
+    QIcon icon = QIcon(":/img/todo_icon.png");
+    //QIcon icon = QIcon("C:/Users/28104/Documents/Qtodo/tmp.png");
     this->setWindowIcon(icon);
     pTrayIcon->setIcon(icon);
     pTrayIcon->setToolTip("Qtodo");
