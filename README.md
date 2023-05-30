@@ -1,4 +1,4 @@
 # Qtodo
-程序设计实习大作业
+Qt-Based Todo-list Program
 
  
