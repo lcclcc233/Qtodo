@@ -3,6 +3,7 @@
 #include "citem.h"
 #include "dialog.h"
 #include "reminder.h"
+#include "item_display.h"
 #include <QMessageBox>
 #include <QCheckBox>
 #include <qfont.h>
@@ -16,8 +17,8 @@ Qtodo::Qtodo(QWidget *parent)
     connect(timer, SIGNAL(timeout()), this, SLOT(on_checkitem()));
     timer->start(10000);
     pTrayIcon = new QSystemTrayIcon(this);
-    //QIcon icon = QIcon(":/tmp.png");//相对路径总是搞不定，暂且搁置
-    QIcon icon = QIcon("C:/Users/28104/Documents/Qtodo/tmp.png");//暂时用着这个图标
+    QIcon icon = QIcon(":/img/todo_icon.png");
+    //QIcon icon = QIcon("C:/Users/28104/Documents/Qtodo/tmp.png");
     this->setWindowIcon(icon);
     pTrayIcon->setIcon(icon);
     pTrayIcon->setToolTip("Qtodo");
@@ -49,7 +50,7 @@ void Qtodo::on_additemButton_clicked()//增加事项
         out=QString("   %1").arg(input.name, -70+input.name.length(), QLatin1Char(' '))+input.ddl.toString("yyyy-MM-dd");
     pitem->setText(out);
     QCheckBox *pcheckbox = new QCheckBox;
-    pcheckbox->setChecked(input.is_finish);//好像没必要？毕竟不会有true
+    pcheckbox->setChecked(input.is_finish);
     ui->listWidget->addItem(pitem);
     ui->listWidget->setItemWidget(pitem,pcheckbox);
     connect(pcheckbox, SIGNAL(stateChanged(int)), this, SLOT(anyStateChanged()));
@@ -76,7 +77,7 @@ void Qtodo::anyStateChanged(){//事项被勾选
 void Qtodo::on_checkitem(){//检测提醒
     QDateTime now=QDateTime::currentDateTime();
     for(int i=0; i < itemcnt; i++){
-        //qDebug()<<now.msecsTo(items[i].reminder_time);
+        qDebug()<<now.msecsTo(items[i].reminder_time);
         if(!items[i].is_finish &&  abs(now.msecsTo(items[i].reminder_time)) <= 5000){
             reminder *prm = new reminder(this, items[i]);
             prm->work();
@@ -99,3 +100,26 @@ void Qtodo::on_activatedSysTrayIcon(QSystemTrayIcon::ActivationReason reason){//
         break;
     }
 }
+
+void Qtodo::on_listWidget_itemClicked(QListWidgetItem *pitem)
+{
+    int row=ui->listWidget->row(pitem);
+    CItem tmp(items[row]);
+    item_display display(this, tmp);
+    int ret=display.exec();
+    display.close();
+    if(ret==Dialog::Rejected)
+        return ;
+    items[row]=tmp;
+    QString out;
+    if(!tmp.is_whole_day)
+        out=QString("   %1").arg(tmp.name, -70+tmp.name.length(), QLatin1Char(' '))+tmp.ddl.toString("yyyy-MM-dd hh:mm:ss");
+    else
+        out=QString("   %1").arg(tmp.name, -70+tmp.name.length(), QLatin1Char(' '))+tmp.ddl.toString("yyyy-MM-dd");
+    pitem->setText(out);
+    QCheckBox *pcheckbox = new QCheckBox;
+    pcheckbox->setChecked(tmp.is_finish);
+    ui->listWidget->setItemWidget(pitem,pcheckbox);
+    connect(pcheckbox, SIGNAL(stateChanged(int)), this, SLOT(anyStateChanged()));
+}
+

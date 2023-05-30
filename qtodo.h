@@ -27,6 +27,8 @@ private slots:
     void on_hideButton_clicked();
 
     void on_activatedSysTrayIcon(QSystemTrayIcon::ActivationReason reason);
+    void on_listWidget_itemClicked(QListWidgetItem *item);
+
 private:
     Ui::Qtodo *ui;
     QTimer *timer;
