@@ -42,4 +42,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     Images.qrc
-    
+
+# add exe icon(in release mode) not widget icon
+RC_ICONS = todo_icon.ico
