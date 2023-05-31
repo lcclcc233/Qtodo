@@ -3,8 +3,8 @@
 
 Dialog::Dialog(CItem &_i, QWidget *parent, const CItem* fa) :
     QDialog(parent),
-    ui(new Ui::Dialog),
-    input(_i)
+    input(_i),
+    ui(new Ui::Dialog)
 {
     setWindowModality(Qt::WindowModal);
     ui->setupUi(this);
