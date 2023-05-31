@@ -6,6 +6,7 @@
 #include <QSystemTrayIcon>
 #include <QTreeWidget>
 #include "citem.h"
+#include "timetable.h"
 QT_BEGIN_NAMESPACE
 namespace Ui { class Qtodo; }
 QT_END_NAMESPACE
@@ -38,9 +39,12 @@ private slots:
 
     void on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column);
 
+    void on_pushButton_clicked();
+
 private:
     Ui::Qtodo *ui;
     QTimer *timer;
     QSystemTrayIcon* pTrayIcon;
+    timetable* ptable;
 };
 #endif // QTODO_H

@@ -29,12 +29,14 @@ Qtodo::Qtodo(QWidget *parent)
     QStringList head;
     head<<"事项名称"<<"截止时间";
     ui->treeWidget->setHeaderLabels(head);
+    ptable = new timetable(this);
 }
 Qtodo::~Qtodo()
 {
     delete ui;
     delete timer;
     delete pTrayIcon;
+    delete ptable;
 }
 
 
@@ -167,5 +169,11 @@ void Qtodo::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *pitem, int)
         return ;
     items[idx]=input;
     additem(pitem, pitem->parent(), input);
+}
+
+
+void Qtodo::on_pushButton_clicked()
+{
+    ptable->exec();
 }
 
