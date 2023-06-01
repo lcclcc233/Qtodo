@@ -3,7 +3,7 @@
 #include "qtodo.h"
 #include "dialog.h"
 #include "citem.h"
-item_display::item_display(QWidget *parent, CItem& i, QTreeWidgetItem* p) :
+item_display::item_display(QWidget *parent, CItem& i, QTreeWidgetItem* p, bool is_son) :
     QDialog(parent),
     ui(new Ui::item_display),
     qtodo((Qtodo*)parent),
@@ -24,6 +24,12 @@ item_display::item_display(QWidget *parent, CItem& i, QTreeWidgetItem* p) :
     ui->dateTimeEdit_2->setDisplayFormat("yyyy-MM-dd hh:mm");
     if(item.is_whole_day)
       ui->checkBox->setCheckState(Qt::Checked);
+    if(item.is_vital)
+      ui->vital_checkBox->setCheckState(Qt::Checked);
+    if(is_son){
+      ui->vital_checkBox->setEnabled(false);
+      ui->addsubButton->setEnabled(false);
+    }
 }
 
 item_display::~item_display()
@@ -36,6 +42,8 @@ void item_display::on_buttonBox_accepted()
     item.name = ui->textEdit->toPlainText();
     item.ddl = ui->dateTimeEdit->dateTime();
     item.reminder_time = ui->dateTimeEdit_2->dateTime();
+    item.is_whole_day = ui->checkBox->checkState();
+    item.is_vital = ui->vital_checkBox->checkState();
 }
 
 

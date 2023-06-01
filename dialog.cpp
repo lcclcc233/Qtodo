@@ -20,6 +20,12 @@ Dialog::Dialog(CItem &_i, QWidget *parent, const CItem* fa) :
     else
         ui->dateTimeEdit_2->setDateTime(fa->reminder_time);
     ui->dateTimeEdit_2->setDisplayFormat("yyyy-MM-dd hh:mm");
+    if(fa!=NULL){
+        ui->vital_checkBox->setEnabled(false);
+        input.is_vital = fa->is_vital;
+        if(input.is_vital)
+            ui->vital_checkBox->setCheckState(Qt::Checked);
+    }
 }
 Dialog::~Dialog()
 {
@@ -51,5 +57,16 @@ void Dialog::on_wholeday_checkBox_stateChanged(int state)
 void Dialog::on_dateTimeEdit_dateTimeChanged(const QDateTime &dateTime)
 {
     ui->dateTimeEdit_2->setDateTime(dateTime);
+}
+
+
+void Dialog::on_vital_checkBox_stateChanged(int state)
+{
+    if(state==Qt::Checked){
+        input.is_vital=true;
+    }
+    else{
+        input.is_vital=false;
+    }
 }
 

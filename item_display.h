@@ -14,7 +14,7 @@ class item_display : public QDialog
     Q_OBJECT
 
 public:
-    explicit item_display(QWidget *parent, CItem &i, QTreeWidgetItem* p);
+    explicit item_display(QWidget *parent, CItem &i, QTreeWidgetItem* p, bool is_son = false);
     ~item_display();
 
 private slots:
