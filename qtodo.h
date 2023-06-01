@@ -45,6 +45,10 @@ private slots:
 
     void on_pushButton_3_clicked();
 
+    void on_out_pushButton_clicked();
+
+    void on_open_pushButton_clicked();
+
 private:
     Ui::Qtodo *ui;
     QTimer *timer;

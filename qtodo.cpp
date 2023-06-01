@@ -10,6 +10,7 @@
 #include <QTimer>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
+#include <QFileDialog>
 Qtodo::Qtodo(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::Qtodo)
@@ -196,6 +197,97 @@ void Qtodo::on_pushButton_3_clicked()//显示重要的
         QTreeWidgetItem *pitem = ui->treeWidget->topLevelItem(i);
         int idx = childid[0][i];
         pitem->setHidden(!items[idx].is_vital);
+    }
+}
+
+
+void Qtodo::on_out_pushButton_clicked()//导出数据
+{
+    QString filepath = QFileDialog::getSaveFileName(this, "Save file", "./", "Txt files(*.txt)");
+    QFile file(filepath);
+    if(!file.open(QIODevice::WriteOnly | QIODevice::Text)){
+        qDebug()<<"File not found!";
+        return ;
+    }
+    QTextStream out(&file);
+    out<<"Qtodo"<<Qt::endl;
+    out<<itemcnt<<Qt::endl;
+    for(int i=1; i<=itemcnt; i++){
+        out<<items[i].name<<Qt::endl;
+        out<<items[i].ddl.toString("yyyy-MM-dd hh:mm")<<Qt::endl;
+        out<<items[i].reminder_time.toString("yyyy-MM-dd hh:mm")<<Qt::endl;
+        out<<items[i].is_finish<<Qt::endl;
+        out<<items[i].is_whole_day<<Qt::endl;
+        out<<items[i].is_vital<<Qt::endl;
+    }
+    for(int i = 0; i < ui->treeWidget->topLevelItemCount(); i++){
+        QTreeWidgetItem *tmp = ui->treeWidget->topLevelItem(i);
+        int idx = find_id(tmp);
+        out<<idx<<" ";
+    }
+    out<<"0"<<Qt::endl;
+    for(int i = 0; i < ui->treeWidget->topLevelItemCount(); i++){
+        QTreeWidgetItem *tmp = ui->treeWidget->topLevelItem(i);
+        int idx = find_id(tmp);
+        out<<idx<<" ";
+        for(int j=0;childid[idx][j]!=0;j++){
+            out<<childid[idx][j]<<" ";
+        }
+        out<<"0"<<Qt::endl;
+    }
+}
+
+void Qtodo::on_open_pushButton_clicked()
+{
+    QString filepath = QFileDialog::getOpenFileName(this, "Open file", "./", "Txt files(*.txt)");
+    QFile file(filepath);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        qDebug()<<"File not found!";
+        return ;
+    }
+    QTextStream in(&file);
+    QString str;
+    in>>str;
+    if(str!=QString("Qtodo")){
+        qDebug()<<"Invalid data!";
+        return ;
+    }
+    in>>itemcnt;
+    int tmp;
+    for(int i = 1; i <= itemcnt; i++){
+        in.readLine();
+        str = in.readLine();
+        items[i].name = str;
+        str = in.readLine();
+        items[i].ddl = QDateTime::fromString(str, "yyyy-MM-dd hh:mm");
+        str = in.readLine();
+        items[i].reminder_time = QDateTime::fromString(str, "yyyy-MM-dd hh:mm");
+        in>>tmp;
+        items[i].is_finish = tmp;
+        in>>tmp;
+        items[i].is_whole_day = tmp;
+        in>>tmp;
+        items[i].is_vital = tmp;
+    }
+    ui->treeWidget->clear();
+    for(int j = 0; ; j++){
+        in>>tmp;
+        if(!tmp)
+            break;
+        childid[0][j] = tmp;
+        additem(NULL, NULL, items[tmp]);
+    }
+    for(int i = 0; i < ui->treeWidget->topLevelItemCount(); i++){
+        QTreeWidgetItem *fa = ui->treeWidget->topLevelItem(i);
+        int idx;
+        in>>idx;
+        for(int j = 0; ; j++){
+            in>>tmp;
+            if(!tmp)
+                break;
+            childid[idx][j] = tmp;
+            additem(NULL, fa, items[tmp]);
+        }
     }
 }
 
