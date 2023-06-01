@@ -53,13 +53,13 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>440</y>
-     <width>141</width>
-     <height>21</height>
+     <y>441</y>
+     <width>271</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
-    <string>注：支持ctrl多选</string>
+    <string>注：先选择对应时间再添加/删除 支持ctrl多选</string>
    </property>
   </widget>
  </widget>

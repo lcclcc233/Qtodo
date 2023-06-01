@@ -111,6 +111,19 @@
     <string>提醒时间</string>
    </property>
   </widget>
+  <widget class="QCheckBox" name="vital_checkBox">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>230</y>
+     <width>81</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>重要事项</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections>

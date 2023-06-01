@@ -12,8 +12,9 @@ public:
     QDateTime reminder_time;
     bool is_finish;
     bool is_whole_day;
+    bool is_vital;
     CItem();
-    CItem(QString _s, QDateTime _d, QDateTime _r, bool _iw=false, bool _if=false);
+    CItem(QString _s, QDateTime _d, QDateTime _r, bool _iw=false, bool _if=false, bool _iv=false);
 };
 
 #endif // CITEM_H

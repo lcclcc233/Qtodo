@@ -40,11 +40,14 @@ Qtodo::~Qtodo()
 }
 
 
-void Qtodo::additem(QTreeWidgetItem* pitem, QTreeWidgetItem* fa, const CItem& input){
+void Qtodo::additem(QTreeWidgetItem* pitem, QTreeWidgetItem* fa, const CItem& input){//增加事项的模板函数
     if(pitem==NULL)
         pitem = new QTreeWidgetItem;
     pitem->setText(0,"   "+input.name);
-    pitem->setText(1,input.ddl.toString("yyyy-MM-dd hh:mm"));
+    if(!input.is_whole_day)
+      pitem->setText(1,input.ddl.toString("yyyy-MM-dd hh:mm"));
+    else
+      pitem->setText(1,input.ddl.toString("yyyy-MM-dd"));
     QCheckBox *pcheckbox = new QCheckBox;
     pcheckbox->setChecked(input.is_finish);
     if(fa==NULL)
@@ -66,7 +69,7 @@ void Qtodo::on_additemButton_clicked()//增加事项
     additem(NULL, NULL, input);
     childid[0][ui->treeWidget->topLevelItemCount() - 1] = itemcnt;
 }
-void Qtodo::handlecheck(QTreeWidgetItem* fa, int fid, bool paint){
+void Qtodo::handlecheck(QTreeWidgetItem* fa, int fid, bool paint){//处理已完成的传递
     for(int i = 0; i< fa->childCount(); i++){
         QTreeWidgetItem *pitem = fa->child(i);
         int idx = childid[fid][i];
@@ -140,7 +143,7 @@ void Qtodo::on_activatedSysTrayIcon(QSystemTrayIcon::ActivationReason reason){//
     }
 }
 
-int Qtodo::find_id(QTreeWidgetItem *pitem){
+int Qtodo::find_id(QTreeWidgetItem *pitem){//寻找pitem对应的items的idx
     QTreeWidgetItem *fa = pitem->parent();
     if(fa == NULL){
         for(int i = 0; i < ui->treeWidget->topLevelItemCount(); i++){
@@ -158,11 +161,11 @@ int Qtodo::find_id(QTreeWidgetItem *pitem){
     qDebug()<<"find_id error";
     return 0;
 }
-void Qtodo::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *pitem, int)
+void Qtodo::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *pitem, int)//双击事项显示详细信息
 {
     int idx=find_id(pitem);
     CItem input(items[idx]);
-    item_display display(this, input, pitem);
+    item_display display(this, input, pitem, pitem->parent()!=NULL);
     int ret=display.exec();
     display.close();
     if(ret==Dialog::Rejected)
@@ -172,8 +175,27 @@ void Qtodo::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *pitem, int)
 }
 
 
-void Qtodo::on_pushButton_clicked()
+void Qtodo::on_pushButton_clicked()//开启课表
 {
     ptable->exec();
+}
+
+
+void Qtodo::on_pushButton_2_clicked()//全部显示
+{
+    for(int i = 0; i < ui->treeWidget->topLevelItemCount(); i++){
+        QTreeWidgetItem *pitem = ui->treeWidget->topLevelItem(i);
+        pitem->setHidden(false);
+    }
+}
+
+
+void Qtodo::on_pushButton_3_clicked()//显示重要的
+{
+    for(int i = 0; i < ui->treeWidget->topLevelItemCount(); i++){
+        QTreeWidgetItem *pitem = ui->treeWidget->topLevelItem(i);
+        int idx = childid[0][i];
+        pitem->setHidden(!items[idx].is_vital);
+    }
 }
 

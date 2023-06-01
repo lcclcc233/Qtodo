@@ -22,6 +22,8 @@ private slots:
 
     void on_dateTimeEdit_dateTimeChanged(const QDateTime &dateTime);
 
+    void on_vital_checkBox_stateChanged(int arg1);
+
 private:
     Ui::Dialog *ui;
 };
