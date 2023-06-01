@@ -162,6 +162,32 @@
      </property>
     </column>
    </widget>
+   <widget class="QPushButton" name="out_pushButton">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>520</y>
+      <width>91</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>导出数据</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="open_pushButton">
+    <property name="geometry">
+     <rect>
+      <x>620</x>
+      <y>520</y>
+      <width>91</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>打开数据</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -169,7 +195,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>25</height>
+     <height>17</height>
     </rect>
    </property>
   </widget>
