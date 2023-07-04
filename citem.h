@@ -13,8 +13,9 @@ public:
     bool is_finish;
     bool is_whole_day;
     bool is_vital;
+    QString category;
     CItem();
-    CItem(QString _s, QDateTime _d, QDateTime _r, bool _iw=false, bool _if=false, bool _iv=false);
+    CItem(QString _s, QDateTime _d, QDateTime _r, bool _iw=false, bool _if=false, bool _iv=false,QString _c="无");
 };
 
 #endif // CITEM_H
