@@ -27,6 +27,14 @@ Qtodo::Qtodo(QWidget *parent)
     pTrayIcon->setToolTip("Qtodo");
     connect(pTrayIcon,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this,SLOT(on_activatedSysTrayIcon(QSystemTrayIcon::ActivationReason)));
     ui->treeWidget->setColumnCount(2);
+
+    categorymenu = new QMenu();
+    categorychoice[0] = new QAction(QIcon(":/img/check.png"), "全部");
+    categorymenu->addAction(categorychoice[0]);
+    ui->categoryButton->setMenu(categorymenu);
+    categoryname[0] = "无";
+    connect(categorymenu, SIGNAL(triggered(QAction*)), this, SLOT(action_triggered(QAction*)));
+
     QStringList head;
     head<<"事项名称"<<"截止时间";
     ui->treeWidget->setHeaderLabels(head);
@@ -38,6 +46,7 @@ Qtodo::~Qtodo()
     delete timer;
     delete pTrayIcon;
     delete ptable;
+    delete categorymenu;
 }
 
 
@@ -56,7 +65,17 @@ void Qtodo::additem(QTreeWidgetItem* pitem, QTreeWidgetItem* fa, const CItem& in
     else
         fa->addChild(pitem);
     ui->treeWidget->setItemWidget(pitem, 0, pcheckbox);
+    ui->pushButton_3->setCheckable(true);
     connect(pcheckbox, SIGNAL(stateChanged(int)), this, SLOT(anyStateChanged()));
+    for(int i=0;i<categorycnt;i++){
+        if(categoryname[i]==input.category)
+            return ;
+    }
+    categoryname[categorycnt] = input.category;
+    categorychoice[categorycnt] = new QAction(QIcon(":/img/check.png"), input.category);
+    categorymenu->addAction(categorychoice[categorycnt]);
+    categorychoice[categorycnt]->setIconVisibleInMenu(false);
+    categorycnt++;
 }
 void Qtodo::on_additemButton_clicked()//增加事项
 {
@@ -184,6 +203,10 @@ void Qtodo::on_pushButton_clicked()//开启课表
 
 void Qtodo::on_pushButton_2_clicked()//全部显示
 {
+    show_vital = false;
+    ui->pushButton_3->setChecked(false);
+    categorychoice[categorynow]->setIconVisibleInMenu(false);
+    categorychoice[0]->setIconVisibleInMenu(true);
     for(int i = 0; i < ui->treeWidget->topLevelItemCount(); i++){
         QTreeWidgetItem *pitem = ui->treeWidget->topLevelItem(i);
         pitem->setHidden(false);
@@ -193,13 +216,59 @@ void Qtodo::on_pushButton_2_clicked()//全部显示
 
 void Qtodo::on_pushButton_3_clicked()//显示重要的
 {
-    for(int i = 0; i < ui->treeWidget->topLevelItemCount(); i++){
-        QTreeWidgetItem *pitem = ui->treeWidget->topLevelItem(i);
-        int idx = childid[0][i];
-        pitem->setHidden(!items[idx].is_vital);
+    show_vital = ui->pushButton_3->isChecked();
+    if(show_vital)
+        for(int i = 0; i < ui->treeWidget->topLevelItemCount(); i++){
+            QTreeWidgetItem *pitem = ui->treeWidget->topLevelItem(i);
+            int idx = childid[0][i];
+            if(!pitem->isHidden()&&items[idx].is_vital)
+                pitem->setHidden(false);
+            else
+                pitem->setHidden(true);
+        }
+    else
+        for(int i = 0; i < ui->treeWidget->topLevelItemCount(); i++){
+            QTreeWidgetItem *pitem = ui->treeWidget->topLevelItem(i);
+            int idx = childid[0][i];
+            if(categorynow==0 || items[idx].category==categoryname[categorynow])
+                pitem->setHidden(false);
+            else
+                pitem->setHidden(true);
+        }
+}
+void Qtodo::action_triggered(QAction* action){//分类显示
+    for(int j=0; j<categorycnt; j++){
+        if(action == categorychoice[j])
+            categorychoice[j]->setIconVisibleInMenu(true);
+        else
+            categorychoice[j]->setIconVisibleInMenu(false);
+    }
+    if(action == categorychoice[0]){
+        for(int i = 0; i < ui->treeWidget->topLevelItemCount(); i++){
+            QTreeWidgetItem *pitem = ui->treeWidget->topLevelItem(i);
+            int idx = childid[0][i];
+            if(show_vital&&!items[idx].is_vital)
+                pitem->setHidden(true);
+            else
+                pitem->setHidden(false);
+        }
+    }
+    else{
+        for(int j=1; j<categorycnt; j++){
+            if(action == categorychoice[j]){
+                for(int i = 0; i < ui->treeWidget->topLevelItemCount(); i++){
+                    QTreeWidgetItem *pitem = ui->treeWidget->topLevelItem(i);
+                    int idx = childid[0][i];
+                    if(items[idx].category == categoryname[j] && (!show_vital || items[idx].is_vital))
+                        pitem->setHidden(false);
+                    else
+                        pitem->setHidden(true);
+                }
+                categorynow = j;
+            }
+        }
     }
 }
-
 
 void Qtodo::on_out_pushButton_clicked()//导出数据
 {

@@ -21,6 +21,12 @@ public:
     CItem items[100];
     int childid[100][100];
     int itemcnt = 0;
+    QMenu *categorymenu;
+    QAction* categorychoice[100];
+    QString categoryname[100];
+    int categorycnt = 1;
+    int categorynow = 0;
+    bool show_vital = false;
     void additem(QTreeWidgetItem* pitem, QTreeWidgetItem* fa, const CItem& input) ;
     int find_id(QTreeWidgetItem *item);
 private slots:
@@ -49,6 +55,7 @@ private slots:
 
     void on_open_pushButton_clicked();
 
+    void action_triggered(QAction *action);
 private:
     Ui::Qtodo *ui;
     QTimer *timer;

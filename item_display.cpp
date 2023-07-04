@@ -29,7 +29,13 @@ item_display::item_display(QWidget *parent, CItem& i, QTreeWidgetItem* p, bool i
     if(is_son){
       ui->vital_checkBox->setEnabled(false);
       ui->addsubButton->setEnabled(false);
+      ui->comboBox->setEnabled(false);
     }
+    for(int i=0;i<((Qtodo*)parent)->categorycnt;i++){
+      ui->comboBox->addItem(((Qtodo*)parent)->categoryname[i]);
+    }
+    ui->comboBox->setCurrentText(item.category);
+    ui->comboBox->setEditable(true);
 }
 
 item_display::~item_display()
@@ -44,6 +50,7 @@ void item_display::on_buttonBox_accepted()
     item.reminder_time = ui->dateTimeEdit_2->dateTime();
     item.is_whole_day = ui->checkBox->checkState();
     item.is_vital = ui->vital_checkBox->checkState();
+    item.category = ui->comboBox->currentText();
 }
 
 
@@ -71,7 +78,7 @@ void item_display::on_dateTimeEdit_dateTimeChanged(const QDateTime &dateTime)
 void item_display::on_addsubButton_clicked()
 {
     CItem &input = qtodo->items[qtodo->itemcnt + 1];
-    Dialog* pDialog = new Dialog(input, this, &item);
+    Dialog* pDialog = new Dialog(input, qtodo, &item);
     int ret = pDialog->exec();
     pDialog->close();
     if(ret == QDialog::Rejected)

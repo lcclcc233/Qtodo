@@ -1,6 +1,6 @@
 #include "dialog.h"
 #include "ui_dialog.h"
-
+#include "qtodo.h"
 Dialog::Dialog(CItem &_i, QWidget *parent, const CItem* fa) :
     QDialog(parent),
     input(_i),
@@ -20,12 +20,19 @@ Dialog::Dialog(CItem &_i, QWidget *parent, const CItem* fa) :
     else
         ui->dateTimeEdit_2->setDateTime(fa->reminder_time);
     ui->dateTimeEdit_2->setDisplayFormat("yyyy-MM-dd hh:mm");
+    for(int i=0;i<((Qtodo*)parent)->categorycnt;i++){
+        ui->comboBox->addItem(((Qtodo*)parent)->categoryname[i]);
+    }
     if(fa!=NULL){
         ui->vital_checkBox->setEnabled(false);
+        ui->comboBox->setEnabled(false);
         input.is_vital = fa->is_vital;
         if(input.is_vital)
             ui->vital_checkBox->setCheckState(Qt::Checked);
+        input.category = fa->category;
+        ui->comboBox->setCurrentText(input.category);
     }
+    ui->comboBox->setEditable(true);
 }
 Dialog::~Dialog()
 {
@@ -38,6 +45,7 @@ void Dialog::on_buttonBox_accepted()
     input.ddl = ui->dateTimeEdit->dateTime();
     input.is_finish = false;
     input.reminder_time = ui->dateTimeEdit_2->dateTime();
+    input.category = ui->comboBox->currentText();
 }
 
 
