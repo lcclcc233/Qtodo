@@ -22,6 +22,7 @@ timetable::timetable(QWidget *parent) :
             ui->tableWidget->setItem(i, j, pitem);
         }
     }
+    ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
 }
 
 timetable::~timetable()

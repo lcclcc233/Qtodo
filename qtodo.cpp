@@ -143,6 +143,21 @@ void Qtodo::on_checkitem(){//检测提醒
         if(!items[i].is_finish &&  abs(now.msecsTo(items[i].reminder_time)) <= 5000){
             reminder *prm = new reminder(this, items[i]);
             prm->work();
+            if(items[i].is_weekly){
+                items[i].ddl = items[i].ddl.addDays(7);
+                items[i].reminder_time = items[i].reminder_time.addDays(7);
+                for(int j = 0; j < ui->treeWidget->topLevelItemCount(); j++){
+                    QTreeWidgetItem *tmp = ui->treeWidget->topLevelItem(j);
+                    if(childid[0][j] == i)
+                        additem(tmp, tmp->parent(), items[i]);
+                    for(int k = 0; k < tmp->childCount(); k++){
+                        QTreeWidgetItem *tt = tmp->child(k);
+                        if(childid[childid[0][j]][k] == i)
+                            additem(tt, tt->parent(), items[i]);
+                    }
+                }
+
+            }
         }
     }
 }

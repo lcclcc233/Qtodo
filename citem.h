@@ -14,8 +14,9 @@ public:
     bool is_whole_day;
     bool is_vital;
     QString category;
+    bool is_weekly;
     CItem();
-    CItem(QString _s, QDateTime _d, QDateTime _r, bool _iw=false, bool _if=false, bool _iv=false,QString _c="无");
+    CItem(QString _s, QDateTime _d, QDateTime _r, bool _iw=false, bool _if=false, bool _iv=false,QString _c="无",bool _ik=false);
 };
 
 #endif // CITEM_H

@@ -26,11 +26,15 @@ Dialog::Dialog(CItem &_i, QWidget *parent, const CItem* fa) :
     if(fa!=NULL){
         ui->vital_checkBox->setEnabled(false);
         ui->comboBox->setEnabled(false);
+        ui->week_checkBox->setEnabled(false);
         input.is_vital = fa->is_vital;
         if(input.is_vital)
             ui->vital_checkBox->setCheckState(Qt::Checked);
         input.category = fa->category;
         ui->comboBox->setCurrentText(input.category);
+        input.is_weekly=fa->is_weekly;
+        if(input.is_weekly)
+            ui->week_checkBox->setCheckState(Qt::Checked);
     }
     ui->comboBox->setEditable(true);
 }
@@ -46,6 +50,7 @@ void Dialog::on_buttonBox_accepted()
     input.is_finish = false;
     input.reminder_time = ui->dateTimeEdit_2->dateTime();
     input.category = ui->comboBox->currentText();
+    input.is_weekly = ui->week_checkBox->checkState();
 }
 
 

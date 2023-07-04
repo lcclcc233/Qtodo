@@ -147,6 +147,19 @@
     <string>事项分类</string>
    </property>
   </widget>
+  <widget class="QCheckBox" name="week_checkBox">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>250</y>
+     <width>81</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>每周重复</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections>

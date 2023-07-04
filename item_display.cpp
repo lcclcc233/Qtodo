@@ -26,10 +26,13 @@ item_display::item_display(QWidget *parent, CItem& i, QTreeWidgetItem* p, bool i
       ui->checkBox->setCheckState(Qt::Checked);
     if(item.is_vital)
       ui->vital_checkBox->setCheckState(Qt::Checked);
+    if(item.is_weekly)
+      ui->week_checkBox->setCheckState(Qt::Checked);
     if(is_son){
       ui->vital_checkBox->setEnabled(false);
       ui->addsubButton->setEnabled(false);
       ui->comboBox->setEnabled(false);
+      ui->week_checkBox->setEnabled(false);
     }
     for(int i=0;i<((Qtodo*)parent)->categorycnt;i++){
       ui->comboBox->addItem(((Qtodo*)parent)->categoryname[i]);
@@ -51,6 +54,7 @@ void item_display::on_buttonBox_accepted()
     item.is_whole_day = ui->checkBox->checkState();
     item.is_vital = ui->vital_checkBox->checkState();
     item.category = ui->comboBox->currentText();
+    item.is_weekly = ui->week_checkBox->checkState();
 }
 
 
