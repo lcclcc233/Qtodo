@@ -1,7 +1,7 @@
 #include "dialog.h"
 #include "ui_dialog.h"
 #include "qtodo.h"
-Dialog::Dialog(CItem &_i, QWidget *parent, const CItem* fa) :
+Dialog::Dialog(CItem &_i, QWidget *parent, const CItem* fa, const QDateTime qdt) :
     QDialog(parent),
     input(_i),
     ui(new Ui::Dialog)
@@ -10,13 +10,13 @@ Dialog::Dialog(CItem &_i, QWidget *parent, const CItem* fa) :
     ui->setupUi(this);
     ui->dateTimeEdit->setCalendarPopup(true);
     if(fa==NULL)
-        ui->dateTimeEdit->setDateTime(QDateTime::currentDateTime());
+        ui->dateTimeEdit->setDateTime(qdt);
     else
         ui->dateTimeEdit->setDateTime(fa->ddl);
     ui->dateTimeEdit->setDisplayFormat("yyyy-MM-dd hh:mm");
     ui->dateTimeEdit_2->setCalendarPopup(true);
     if(fa==NULL)
-        ui->dateTimeEdit_2->setDateTime(QDateTime::currentDateTime());
+        ui->dateTimeEdit_2->setDateTime(qdt);
     else
         ui->dateTimeEdit_2->setDateTime(fa->reminder_time);
     ui->dateTimeEdit_2->setDisplayFormat("yyyy-MM-dd hh:mm");

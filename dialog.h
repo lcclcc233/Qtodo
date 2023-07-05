@@ -2,6 +2,7 @@
 #define DIALOG_H
 
 #include <QDialog>
+#include <QDateTime>
 #include "citem.h"
 namespace Ui {
 class Dialog;
@@ -14,7 +15,7 @@ class Dialog : public QDialog
 public:
     ~Dialog();
     CItem &input;
-    explicit Dialog(CItem &_i, QWidget *parent = nullptr,const CItem* fa=NULL);
+    explicit Dialog(CItem &_i, QWidget *parent = nullptr,const CItem* fa=NULL, const QDateTime qdt=QDateTime::currentDateTime());
 private slots:
     void on_buttonBox_accepted();
 

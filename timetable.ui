@@ -62,6 +62,19 @@
     <string>注：先选择对应时间再添加/删除 支持ctrl多选</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="itemButton">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>420</y>
+     <width>81</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>添加提醒</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

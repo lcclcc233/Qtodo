@@ -20,8 +20,11 @@ private slots:
 
     void on_delButton_clicked();
 
+    void on_itemButton_clicked();
+
 private:
     Ui::timetable *ui;
+    QWidget *pa;
 };
 
 #endif // TIMETABLE_H
