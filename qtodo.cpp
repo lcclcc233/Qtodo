@@ -11,6 +11,9 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QFileDialog>
+#include <qjsondocument.h>
+#include <qjsonobject.h>
+#include <qjsonarray.h>
 Qtodo::Qtodo(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::Qtodo)
@@ -60,6 +63,12 @@ void Qtodo::additem(QTreeWidgetItem* pitem, QTreeWidgetItem* fa, const CItem& in
       pitem->setText(1,input.ddl.toString("yyyy-MM-dd"));
     QCheckBox *pcheckbox = new QCheckBox;
     pcheckbox->setChecked(input.is_finish);
+    if(input.is_finish){
+      QFont font;
+      font.setStrikeOut(true);
+      pitem->setFont(0, font);
+      pitem->setFont(1, font);
+    }
     if(fa==NULL)
         ui->treeWidget->addTopLevelItem(pitem);
     else
@@ -287,90 +296,162 @@ void Qtodo::action_triggered(QAction* action){//分类显示
 
 void Qtodo::on_out_pushButton_clicked()//导出数据
 {
-    QString filepath = QFileDialog::getSaveFileName(this, "Save file", "./", "Txt files(*.txt)");
+
+    QString filepath = QFileDialog::getSaveFileName(this, "Save file", "./", "Json files(*.json)");
     QFile file(filepath);
     if(!file.open(QIODevice::WriteOnly | QIODevice::Text)){
         qDebug()<<"File not found!";
         return ;
     }
-    QTextStream out(&file);
-    out<<"Qtodo"<<Qt::endl;
-    out<<itemcnt<<Qt::endl;
+    QJsonObject root;
+    QJsonArray itemarray;
     for(int i=1; i<=itemcnt; i++){
-        out<<items[i].name<<Qt::endl;
-        out<<items[i].ddl.toString("yyyy-MM-dd hh:mm")<<Qt::endl;
-        out<<items[i].reminder_time.toString("yyyy-MM-dd hh:mm")<<Qt::endl;
-        out<<items[i].is_finish<<Qt::endl;
-        out<<items[i].is_whole_day<<Qt::endl;
-        out<<items[i].is_vital<<Qt::endl;
+        QJsonObject item;
+        item.insert("name",QJsonValue(items[i].name));
+        item.insert("ddl",QJsonValue(items[i].ddl.toString("yyyy-MM-dd hh:mm")));
+        item.insert("reminder_time",QJsonValue(items[i].reminder_time.toString("yyyy-MM-dd hh:mm")));
+        item.insert("is_finish",QJsonValue(items[i].is_finish));
+        item.insert("is_whole_day",QJsonValue(items[i].is_whole_day));
+        item.insert("is_vital",QJsonValue(items[i].is_vital));
+        item.insert("is_weekly",QJsonValue(items[i].is_weekly));
+        item.insert("category",QJsonValue(items[i].category));
+        itemarray.append(item);
     }
+    root.insert("items",itemarray);
+    QJsonArray toparray;
     for(int i = 0; i < ui->treeWidget->topLevelItemCount(); i++){
         QTreeWidgetItem *tmp = ui->treeWidget->topLevelItem(i);
         int idx = find_id(tmp);
-        out<<idx<<" ";
+        toparray.append(QJsonValue(idx));
     }
-    out<<"0"<<Qt::endl;
+    root.insert("toparray",toparray);
+    QJsonArray relationarray;
     for(int i = 0; i < ui->treeWidget->topLevelItemCount(); i++){
+        QJsonObject relation;
         QTreeWidgetItem *tmp = ui->treeWidget->topLevelItem(i);
         int idx = find_id(tmp);
-        out<<idx<<" ";
+        relation.insert("topid",idx);
+        QJsonArray childarray;
         for(int j=0;childid[idx][j]!=0;j++){
-            out<<childid[idx][j]<<" ";
+            childarray.append(QJsonValue(childid[idx][j]));
         }
-        out<<"0"<<Qt::endl;
+        relation.insert("child",childarray);
+        relationarray.append(relation);
     }
+    root.insert("relation",relationarray);
+    QJsonArray time_table;
+    for(int i = 0; i < 12; i++){
+        for(int j = 0; j < 7; j++){
+            QString text;
+            int R,G,B;
+            ptable->gettext(i,j,text,R,G,B);
+            if(text=="")
+                continue ;
+            QJsonObject course;
+            course.insert("row",i);
+            course.insert("column",j);
+            course.insert("name",text);
+            course.insert("R",R);
+            course.insert("G",G);
+            course.insert("B",B);
+            time_table.append(course);
+        }
+    }
+    root.insert("time_table",time_table);
+    QJsonDocument doc(root);
+    QByteArray data=doc.toJson();
+    file.write(data);
+    file.close();
 }
 
 void Qtodo::on_open_pushButton_clicked()
 {
-    QString filepath = QFileDialog::getOpenFileName(this, "Open file", "./", "Txt files(*.txt)");
+    QString filepath = QFileDialog::getOpenFileName(this, "Open file", "./", "Json files(*.json)");
     QFile file(filepath);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
         qDebug()<<"File not found!";
         return ;
     }
-    QTextStream in(&file);
-    QString str;
-    in>>str;
-    if(str!=QString("Qtodo")){
-        qDebug()<<"Invalid data!";
-        return ;
-    }
-    in>>itemcnt;
-    int tmp;
-    for(int i = 1; i <= itemcnt; i++){
-        in.readLine();
-        str = in.readLine();
-        items[i].name = str;
-        str = in.readLine();
-        items[i].ddl = QDateTime::fromString(str, "yyyy-MM-dd hh:mm");
-        str = in.readLine();
-        items[i].reminder_time = QDateTime::fromString(str, "yyyy-MM-dd hh:mm");
-        in>>tmp;
-        items[i].is_finish = tmp;
-        in>>tmp;
-        items[i].is_whole_day = tmp;
-        in>>tmp;
-        items[i].is_vital = tmp;
+    QByteArray data=file.readAll();
+    file.close();
+    QJsonDocument doc=QJsonDocument::fromJson(data);
+    QJsonObject root=doc.object();
+    if(root.contains("items")){
+        QJsonValue itemarraytmp=root.value("items");
+        QJsonArray itemarray=itemarraytmp.toArray();
+        itemcnt=itemarray.size();
+        for(int i=1;i<=itemcnt;i++){
+            QJsonValue itemtmp=itemarray.at(i-1);
+            QJsonObject item=itemtmp.toObject();
+            QJsonValue tmp;
+            tmp=item.value("name");
+            items[i].name=tmp.toString();
+            tmp=item.value("ddl");
+            items[i].ddl=QDateTime::fromString(tmp.toString(), "yyyy-MM-dd hh:mm");
+            tmp=item.value("reminder_time");
+            items[i].reminder_time=QDateTime::fromString(tmp.toString(), "yyyy-MM-dd hh:mm");
+            tmp=item.value("is_finish");
+            items[i].is_finish=tmp.toBool();
+            tmp=item.value("is_whole_day");
+            items[i].is_whole_day=tmp.toBool();
+            tmp=item.value("is_vital");
+            items[i].is_vital=tmp.toBool();
+            tmp=item.value("is_weekly");
+            items[i].is_weekly=tmp.toBool();
+            tmp=item.value("category");
+            items[i].category=tmp.toString();
+        }
     }
     ui->treeWidget->clear();
-    for(int j = 0; ; j++){
-        in>>tmp;
-        if(!tmp)
-            break;
-        childid[0][j] = tmp;
-        additem(NULL, NULL, items[tmp]);
+    categorymenu->clear();
+    categorymenu->addAction(categorychoice[0]);
+    categorycnt=1;
+    categorychoice[0]->setIconVisibleInMenu(true);
+    categorynow=0;
+    if(root.contains("toparray")){
+        QJsonValue toparraytmp=root.value("toparray");
+        QJsonArray toparray=toparraytmp.toArray();
+        int toparraysize=toparray.size();
+        for(int i=0;i<toparraysize;i++){
+            QJsonValue topidtmp=toparray.at(i);
+            int idx=topidtmp.toInt();
+            childid[0][i]=idx;
+            additem(NULL,NULL,items[idx]);
+        }
     }
-    for(int i = 0; i < ui->treeWidget->topLevelItemCount(); i++){
-        QTreeWidgetItem *fa = ui->treeWidget->topLevelItem(i);
-        int idx;
-        in>>idx;
-        for(int j = 0; ; j++){
-            in>>tmp;
-            if(!tmp)
-                break;
-            childid[idx][j] = tmp;
-            additem(NULL, fa, items[tmp]);
+    if(root.contains("relation")){
+        QJsonValue relationarraytmp=root.value("relation");
+        QJsonArray relationarray=relationarraytmp.toArray();
+        int relationarraysize=relationarray.size();
+        for(int i=0;i<relationarraysize;i++){
+            QJsonValue relationtmp=relationarray.at(i);
+            QJsonObject relation=relationtmp.toObject();
+            int topid=relation.value("topid").toInt();
+            QJsonValue childarraytmp=relation.value("child");
+            QJsonArray childarray=childarraytmp.toArray();
+            int childarraysize=childarray.size();
+            for(int j=0;j<childarraysize;j++){
+                int idx=childarray.at(j).toInt();
+                childid[topid][j]=idx;
+                additem(NULL, ui->treeWidget->topLevelItem(i),items[idx]);
+            }
+        }
+    }
+    if(root.contains("time_table")){
+        ptable->clear();
+        QJsonArray time_table=root.value("time_table").toArray();
+        int table_size=time_table.size();
+        for(int i=0;i<table_size;i++){
+            QJsonObject course=time_table.at(i).toObject();
+            QString name;
+            int R,G,B,r,c;
+            R=course.value("R").toInt();
+            G=course.value("G").toInt();
+            B=course.value("B").toInt();
+            r=course.value("row").toInt();
+            c=course.value("column").toInt();
+            name=course.value("name").toString();
+            ptable->additem(r,c,name,R,G,B);
         }
     }
 }
