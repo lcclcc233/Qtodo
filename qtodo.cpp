@@ -374,4 +374,14 @@ void Qtodo::on_open_pushButton_clicked()
         }
     }
 }
-
+void Qtodo::handle_extraadd(QDateTime qdt){
+    CItem &input = items[itemcnt + 1];
+    Dialog* pDialog = new Dialog(input, this, NULL, qdt);
+    int ret = pDialog->exec();
+    pDialog->close();
+    if(ret == QDialog::Rejected)
+        return;
+    itemcnt++;
+    additem(NULL, NULL, input);
+    childid[0][ui->treeWidget->topLevelItemCount() - 1] = itemcnt;
+}

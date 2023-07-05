@@ -29,6 +29,7 @@ public:
     bool show_vital = false;
     void additem(QTreeWidgetItem* pitem, QTreeWidgetItem* fa, const CItem& input) ;
     int find_id(QTreeWidgetItem *item);
+    void handle_extraadd(QDateTime qdt);
 private slots:
 
     void on_additemButton_clicked();
@@ -56,6 +57,7 @@ private slots:
     void on_open_pushButton_clicked();
 
     void action_triggered(QAction *action);
+
 private:
     Ui::Qtodo *ui;
     QTimer *timer;
