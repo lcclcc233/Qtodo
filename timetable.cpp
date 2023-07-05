@@ -65,7 +65,6 @@ void timetable::on_delButton_clicked()
 void timetable::on_itemButton_clicked()
 {
     QList<QTableWidgetItem*>  itemlist = ui->tableWidget->selectedItems();
-    QColor color(255, 255, 255);
     for(int i = 0; i < itemlist.size(); i++){
         int r = itemlist[i]->row();
         int c = itemlist[i]->column();
@@ -123,3 +122,22 @@ void timetable::on_itemButton_clicked()
     }
 }
 
+void timetable::gettext(int r,int c, QString& text, int& R, int& G,int& B){
+    text=ui->tableWidget->item(r,c)->text();
+    R=ui->tableWidget->item(r,c)->background().color().red();
+    G=ui->tableWidget->item(r,c)->background().color().green();
+    B=ui->tableWidget->item(r,c)->background().color().blue();
+}
+void timetable::additem(int r,int c, QString text, int R, int G,int B){
+    ui->tableWidget->item(r,c)->setText(text);
+    QColor color(R,G,B);
+    ui->tableWidget->item(r,c)->setBackground(QBrush(color));
+}
+void timetable::clear(){
+    QColor color(255, 255, 255);
+    for(int i = 0; i < 12; i++)
+        for(int j = 0; j < 7; j++){
+            ui->tableWidget->item(i,j)->setText("");
+            ui->tableWidget->item(i,j)->setBackground(QBrush(color));
+        }
+}

@@ -14,7 +14,9 @@ class timetable : public QDialog
 public:
     explicit timetable(QWidget *parent = nullptr);
     ~timetable();
-
+    void gettext(int r,int c,QString& text,int& R,int& G,int& B);
+    void additem(int r,int c,QString text,int R,int G,int B);
+    void clear();
 private slots:
     void on_addButton_clicked();
 
